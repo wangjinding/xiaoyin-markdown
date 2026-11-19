@@ -2,6 +2,8 @@
 
 一个纯本地的 Windows Markdown 编辑器。左边写、右边看，不联外网、不登录、不收集任何东西。
 
+> 官网 / 下载：<https://md.wangjinding.com>
+
 ## 装在哪（示例）
 
 - 程序：`%USERPROFILE%\Apps\XiaoyinMarkdown\XiaoyinMarkdown.exe`
