@@ -59,19 +59,21 @@ docker exec 1Panel-openresty-npAh nginx -s reload   # 一般不需要，静态�
 
 ## 更新安装包
 
-```bash
-# 1) 本地打包（Linux 上交叉打包 Windows）
-npm install
-npx electron-packager . XiaoyinMarkdown --platform=win32 --arch=x64 --out=dist \
-  --overwrite --asar --icon=build/icon.ico --app-version=2.6.1 \
-  --ignore="^/dist" --ignore="^/tools" --ignore="^/build" --ignore="^/site" \
-  --ignore="^/src-tauri" --ignore="^/\\.git"
+官网主下载项是 **Tauri 安装包**（1.6 MB，装完 .md 默认用它打开）：
 
-# 2) 压缩并发布
-cd dist && zip -qr -9 XiaoyinMarkdown-win32-x64.zip XiaoyinMarkdown-win32-x64 && cd ..
-cp dist/XiaoyinMarkdown-win32-x64.zip \
+```bash
+# 1) 交叉编译 Windows 安装包（详见仓库 README「用 Tauri 打包」）
+npx tauri build --target x86_64-pc-windows-gnu --bundles nsis
+
+# 2) 发布
+R=src-tauri/target/x86_64-pc-windows-gnu/release
+cp $R/bundle/nsis/XiaoyinMarkdown_2.6.1_x64-setup.exe \
    /opt/1panel/www/sites/md.wangjinding.com/index/download/
+cp $R/xiaoyin-markdown.exe \
+   /opt/1panel/www/sites/md.wangjinding.com/index/download/XiaoyinMarkdown-portable.exe
 ```
+
+旧版 Electron 构建（`XiaoyinMarkdown-win32-x64.zip`，152 MB）仍保留在 `download/` 里。
 
 ## 坑
 

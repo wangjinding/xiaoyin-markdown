@@ -189,7 +189,7 @@
       <a class="btn btn-ghost" href="https://github.com/wangjinding/xiaoyin-markdown" target="_blank" rel="noopener">查看源码</a>
     </div>
     <p class="meta">
-      <span>Windows 10 / 11 · x64</span><span>免安装便携版</span><span>MIT 开源</span>
+      <span>Windows 10 / 11 · x64</span><span>安装包仅 1.6 MB</span><span>MIT 开源</span>
     </p>
 
     <div class="shot" aria-hidden="true">
@@ -299,15 +299,30 @@
     <p class="sub">免安装，解压即用。程序只读写你主动打开或保存的文件，不联网。</p>
     <div class="grid">
       <div class="card">
-        <h3><span class="ico">↓</span>Windows 便携版</h3>
-        <p style="margin-bottom:14px">x64 · Windows 10 / 11 · 解压到任意目录，双击 <code>XiaoyinMarkdown.exe</code> 运行。</p>
-        <a class="btn btn-primary" href="/download/XiaoyinMarkdown-win32-x64.zip" download>下载 .zip</a>
+        <h3><span class="ico">↓</span>安装版 <span style="font-size:12px;color:var(--ok);font-weight:600">推荐</span></h3>
+        <p style="margin-bottom:14px">
+          x64 · Windows 10 / 11 · <b>1.6 MB</b>。<br>
+          装完 <b>双击 .md 就直接用小银 Markdown 打开</b>（.markdown / .mdown / .mkd / .mdwn 同理），
+          开始菜单有快捷方式，可在「设置 → 应用」里正常卸载。
+        </p>
+        <a class="btn btn-primary" href="/download/XiaoyinMarkdown_2.6.1_x64-setup.exe" download>下载安装包 .exe</a>
       </div>
       <div class="card">
-        <h3><span class="ico">⌥</span>其它方式</h3>
-        <p style="margin-bottom:14px">源码在 Gitea / GitHub，可自行打包；也可以只把 exe 覆盖到已有目录升级。</p>
-        <a class="btn btn-ghost" href="https://github.com/wangjinding/xiaoyin-markdown" target="_blank" rel="noopener">GitHub 仓库</a>
-        <a class="btn btn-ghost" href="https://git.wangjinding.com/Jidekin/xiaoyin-markdown" target="_blank" rel="noopener">Gitea 仓库</a>
+        <h3><span class="ico">⚏</span>免安装版</h3>
+        <p style="margin-bottom:14px">
+          单个 exe，<b>3.5 MB</b>，放哪都能跑，不写注册表、不改文件关联。<br>
+          适合放 U 盘或不想装东西的时候。
+        </p>
+        <a class="btn btn-ghost" href="/download/XiaoyinMarkdown-portable.exe" download>下载便携版 .exe</a>
+      </div>
+      <div class="card">
+        <h3><span class="ico">⌥</span>源码 / 旧版</h3>
+        <p style="margin-bottom:14px">
+          源码在 Gitea / GitHub，可自行打包。<br>
+          旧版 Electron 构建（152 MB，自带运行时）仍在：<a href="/download/XiaoyinMarkdown-win32-x64.zip">zip 下载</a>。
+        </p>
+        <a class="btn btn-ghost" href="https://github.com/wangjinding/xiaoyin-markdown" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn-ghost" href="https://git.wangjinding.com/Jidekin/xiaoyin-markdown" target="_blank" rel="noopener">Gitea</a>
       </div>
     </div>
     <div class="callout">
@@ -321,9 +336,11 @@
   <div class="wrap">
     <h2>关于</h2>
     <p class="sub">
-      小银 Markdown 是一个纯本地的 Windows 桌面编辑器，界面用 Electron + 自写的零依赖 Markdown 渲染引擎，
-      桌面能力（剪贴板文件、快捷方式等）通过 <code>koffi</code> 直接调用 Win32 API。
-      另有一套 Tauri 2 的桌面壳在 <code>src-tauri/</code>，可按需切换。
+      小银 Markdown 是一个纯本地的 Windows 桌面编辑器，界面是同一套自写的零依赖 Markdown 渲染引擎，桌面壳有两条：
+</p><p class="sub">
+      <b>安装版（默认下载）</b>走 Tauri 2 + 系统 WebView2，安装包只有 1.6 MB，
+      桌面能力（剪贴板文件、文件关联等）由 Rust 直接调 Win32；
+      <b>Electron 版</b>仍保留在仓库里（<code>src/main.js</code>），体积大但自带运行时。
     </p>
     <div class="grid">
       <div class="card">

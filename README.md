@@ -147,6 +147,41 @@ npx electron-packager . XiaoyinMarkdown --platform=win32 --arch=x64 --out=dist ^
 
 打包完成后把 `dist\XiaoyinMarkdown-win32-x64` 整个目录拷到 `%USERPROFILE%\Apps\XiaoyinMarkdown` 覆盖即可（exe 依赖同目录的 dll，不能只拷 exe）。
 
+## 用 Tauri 打包（推荐的安装包）
+
+Tauri 版走系统 WebView2，**安装包只有 1.6 MB**（Electron 版 152 MB）。
+在 Linux 上也能交叉编译出 Windows 安装包：
+
+```bash
+# 一次性准备
+apt-get install -y mingw-w64 nsis
+curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal   # 国内可设 RUSTUP_DIST_SERVER 用清华镜像
+rustup target add x86_64-pc-windows-gnu
+mkdir -p ~/.cargo && cat >> ~/.cargo/config.toml <<'EOF'
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+ar = "x86_64-w64-mingw32-ar"
+EOF
+
+# 打包
+npm install
+npx tauri build --target x86_64-pc-windows-gnu --bundles nsis
+# → src-tauri/target/x86_64-pc-windows-gnu/release/bundle/nsis/XiaoyinMarkdown_<版本>_x64-setup.exe
+```
+
+### 装完 .md 默认用小银 Markdown 打开
+
+两步配合，缺一不可：
+
+1. `tauri.conf.json` 的 `bundle.fileAssociations` → 写 `HKCU\Software\Classes\.md` = `XiaoyinMarkdown.Document`
+   （含 markdown / mdown / mkd / mdwn / txt）
+2. `src-tauri/installer-hooks.nsh`（NSIS `NSIS_HOOK_POSTINSTALL`）→ 删掉
+   `HKCU\...\Explorer\FileExts\.md\UserChoice`。这个键带哈希保护、**只能删不能写**，
+   删掉后系统才回落到第 1 步写的关联，否则用户原来的默认程序会一直赢。
+
+首次双击 .md 时是冷启动，文件路径由 Rust 的 `on_page_load` 读 `argv` 发给前端
+（`main.rs` 里的 `STARTUP_FILE_SENT`）；程序已在运行时再双击，走 single-instance 回调。
+
 ## 说明
 
 - 未做代码签名，首次运行 Windows SmartScreen 可能提示"未知发布者"，选"仍要运行"即可。

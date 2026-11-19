@@ -9,6 +9,9 @@ use tauri_plugin_dialog::DialogExt;
 
 const MD_EXTS: [&str; 6] = ["md", "markdown", "mdown", "mkd", "mdwn", "txt"];
 
+/// 首次启动时 argv 里的文件只发一次（页面重载/多窗口不重复发）
+static STARTUP_FILE_SENT: std::sync::Once = std::sync::Once::new();
+
 /* ---------------- 数据结构 ---------------- */
 
 #[derive(Serialize, Clone)]
@@ -461,6 +464,22 @@ fn migrate_apply(app: AppHandle, mode: String, docs: Vec<serde_json::Value>, kee
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        // 双击 .md 用本程序打开时的「首次启动」路径：
+        //   · 首次启动（进程还不存在）→ 页面加载完成后把 argv 里的文件发给前端
+        //   · 已在运行（再双击另一个文件）→ 走下面的 single_instance 回调
+        // 用 Once 保证只发一次，避免页面重载时反复打开同一个文件。
+        .on_page_load(|webview, payload| {
+            if payload.event() == tauri::webview::PageLoadEvent::Finished {
+                STARTUP_FILE_SENT.call_once(|| {
+                    if let Some(path) = std::env::args()
+                        .skip(1)
+                        .find(|a| PathBuf::from(a).is_file())
+                    {
+                        let _ = webview.emit("open-external", path);
+                    }
+                });
+            }
+        })
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             if let Some(win) = app.get_webview_window("main") {
                 let _ = win.set_focus();
