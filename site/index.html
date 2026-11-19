@@ -112,20 +112,20 @@
   .shot-bar i{width:11px;height:11px;border-radius:50%}
   .shot-bar i:nth-child(1){background:#ff5f57}.shot-bar i:nth-child(2){background:#febc2e}.shot-bar i:nth-child(3){background:#28c840}
   .shot-bar span{margin-left:12px;font-size:12.5px;color:var(--ink-3)}
-  .shot-body{display:grid;grid-template-columns:172px 1fr 162px;min-height:330px}
-  .shot-side,.shot-out{padding:16px 12px;font-size:13px;color:var(--ink-3);border-right:1px solid var(--line);background:#fcfcfe}
-  .shot-out{border-right:0;border-left:1px solid var(--line)}
-  .shot-side b,.shot-out b{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;color:var(--ink-3)}
-  .shot-side div,.shot-out div{padding:5px 9px;border-radius:7px;margin-bottom:3px}
-  .shot-side div.on{background:var(--blue-bg);color:var(--blue-d);font-weight:600}
-  .shot-main{padding:18px 22px;font:13.5px/1.9 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink-2);
-    white-space:pre-wrap;tab-size:2}
-  .shot-main .h{color:var(--blue);font-weight:700}
-  .hl{background:#fff3c4;border-radius:3px;padding:0 1px}
-  .cur{background:#ffd7a8;border-radius:3px}
-  @media(max-width:780px){
-    .shot-body{grid-template-columns:1fr}.shot-side,.shot-out{display:none}
+
+  /* 真实截图 */
+  .shot img,.dark-shot img{display:block;width:100%;height:auto}
+  .shot{border-radius:18px 18px 0 0}
+  .gal{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:860px){.gal{grid-template-columns:1fr}}
+  .gal figure{
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;
+    box-shadow:var(--shadow);transition:.2s;
   }
+  .gal figure:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+  .gal img{display:block;width:100%;height:auto}
+  .gal figcaption{padding:16px 20px 18px;font-size:14.6px;color:var(--ink-2);line-height:1.65}
+  .gal figcaption b{display:block;color:var(--ink);font-size:15.5px;margin-bottom:4px}
 
   /* ───────── 通用区块 ───────── */
   section{padding:96px 0}
@@ -182,9 +182,6 @@
   }
   .dark-shot .shot-bar{background:#161616;border-bottom-color:rgba(255,255,255,.1)}
   .dark-shot .shot-bar span{color:rgba(255,255,255,.4)}
-  .dk-main{padding:22px;font:13.5px/1.95 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:rgba(255,255,255,.72);
-    white-space:pre-wrap;tab-size:2}
-  .dk-main .h{color:var(--blue-l);font-weight:700}
   @media(max-width:880px){.dark-in{grid-template-columns:1fr;gap:36px}}
 
   /* 功能网格 */
@@ -283,30 +280,9 @@
     </div>
 
     <div class="shot">
-      <div class="shot-bar"><i></i><i></i><i></i><span>未命名 — 小银 Markdown</span></div>
-      <div class="shot-body">
-        <div class="shot-side">
-          <b>目录</b>
-          <div class="on">README.md</div>
-          <div>notes.md</div>
-          <div>todo.txt</div>
-        </div>
-        <div class="shot-main">
-<span class="h"># 小银 Markdown</span>
-纯本地的编辑器，<span class="hl">左边写</span>、<span class="hl">右边看</span>。
-<br>
-<span class="h">## 功能</span>
-- 实时预览：编辑 / 分栏 / 阅读<span class="cur">|</span>
-- 多标签 · 多窗口，切换不丢内容
-- 章节大纲 · 查找高亮
-        </div>
-        <div class="shot-out">
-          <b>大纲</b>
-          <div>小银 Markdown</div>
-          <div>功能</div>
-          <div>快捷键</div>
-        </div>
-      </div>
+      <div class="shot-bar"><i></i><i></i><i></i><span>周报-2026-11-19.md — 小银 Markdown</span></div>
+      <img src="/img/app-light.jpg" width="1600" height="1000" decoding="async"
+           alt="小银 Markdown 主界面：左侧文件树、中间 Markdown 源码、右侧实时预览与章节大纲">
     </div>
   </div>
 </div>
@@ -401,19 +377,9 @@
       </div>
     </div>
     <div class="dark-shot">
-      <div class="shot-bar"><i></i><i></i><i></i><span>notes.md — 小银 Markdown</span></div>
-      <div class="dk-main">
-<span class="h">## 今天要做的</span>
-- [x] 写完周报
-- [ ] 整理接口文档
-- [ ] 把 <span style="color:#7ba7ff">README</span> 补一节示例
-<br>
-<span class="h">### 代码示例</span>
-const app = createEditor({
-  theme: 'dark',
-  preview: true,
-})
-      </div>
+      <div class="shot-bar"><i></i><i></i><i></i><span>深色主题 · 周报-2026-11-19.md</span></div>
+      <img src="/img/app-dark.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+           alt="小银 Markdown 深色主题">
     </div>
   </div>
 </section>
@@ -465,6 +431,28 @@ const app = createEditor({
         <div class="key-row"><span>全屏 / 开发者工具</span><span><kbd>F11</kbd><kbd>F12</kbd></span></div>
         <div class="key-row"><span>复制选中的文件</span><span><kbd>Ctrl</kbd><kbd>C</kbd></span></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 真实界面 ══════════ -->
+<section id="gallery" class="sec-white">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>这些<em>都是真实界面</em></h2>
+      <p>不是效果图 —— 就是把程序跑起来截的，一张没修。</p>
+    </div>
+    <div class="gal">
+      <figure>
+        <img src="/img/app-find.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+             alt="查找功能：正文中所有命中标黄、当前命中标橙，右侧预览同步高亮">
+        <figcaption><b>查找与高亮</b>正文里所有命中标黄、当前命中标橙，并自动滚到可视区；计数在右上角</figcaption>
+      </figure>
+      <figure>
+        <img src="/img/app-read.jpg" width="1600" height="1000" loading="lazy" decoding="async"
+             alt="阅读模式：隐藏编辑区，只保留排版后的正文">
+        <figcaption><b>阅读模式</b>收起编辑区只留正文，长文按排版稿看，章节大纲随时跳转</figcaption>
+      </figure>
     </div>
   </div>
 </section>
