@@ -1,0 +1,62 @@
+{
+  "name": "xiaoyin-markdown-editor",
+  "productName": "XiaoyinMarkdown",
+  "version": "2.6.1",
+  "description": "轻量本地 Markdown 编辑器：实时预览、多标签/多窗口、查找高亮、右键复制全文/打开目录、常用快捷键",
+  "main": "src/main.js",
+  "author": "小银",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-packager . XiaoyinMarkdown --platform=win32 --arch=x64 --out=dist --overwrite --asar --app-version=1.0.0",
+    "installer": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "@tauri-apps/cli": "^2.12.6",
+    "electron": "45.4.1",
+    "windows-shortcuts": "^0.1.6"
+  },
+  "dependencies": {
+    "koffi": "^3.3.8"
+  },
+  "build": {
+    "appId": "com.xiaoyin.markdown",
+    "productName": "XiaoyinMarkdown",
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "!tools/**",
+      "!build/**",
+      "!release/**",
+      "!dist/**",
+      "!.cache/**",
+      "!.workbuddy/**",
+      "!shot-*.png",
+      "!README.md"
+    ],
+    "asarUnpack": [
+      "**/node_modules/koffi/**"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "XiaoyinMarkdown-Setup-${version}.exe",
+      "shortcutName": "小银 Markdown",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "uninstallDisplayName": "小银 Markdown"
+    }
+  }
+}
