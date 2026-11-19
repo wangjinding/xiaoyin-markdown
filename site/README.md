@@ -1,0 +1,58 @@
+# 官网部署说明（md.wangjinding.com）
+
+## 链路
+
+```
+访客 ──https://md.wangjinding.com:443──► EdgeOne 边缘（免费 TrustAsia 证书）
+                                          │ 回源 HTTPS 8443，Host=加速域名
+                                          ▼
+                             <回源域名>:8443 ──(光猫映射)──► .8 的 OpenResty
+                                                                        │ server_name 分流
+                                                                        ▼
+                                                              /opt/1panel/www/sites/md.wangjinding.com/index
+```
+
+## 各部分落在哪
+
+| 环节 | 位置 / 参数 |
+| --- | --- |
+| 站点根目录 | `/opt/1panel/www/sites/md.wangjinding.com/index` |
+| nginx 配置 | `/opt/1panel/www/conf.d/md.wangjinding.com.conf`（8082 + 8443 ssl）|
+| 源站证书 | `/opt/1panel/www/sites/md.wangjinding.com/ssl/`（acme.sh + 阿里云 DNS-01，自动续期）|
+| 安装包 | `index/download/XiaoyinMarkdown-win32-x64.zip` |
+| EdgeOne | zone `zone-xxxxxxxx`，加速域名 `md.wangjinding.com`，回源 HTTPS/8443 |
+| WAF 白名单 | `1pwaf/data/conf/sites.json` + `1pwaf/data/sites/md.wangjinding.com/config.json` |
+| DNS | 阿里云 `md` CNAME → `md.wangjinding.com.eo.dnse2.com`（TTL 600）|
+
+## 更新页面
+
+```bash
+cp site/index.html /opt/1panel/www/sites/md.wangjinding.com/index/
+docker exec 1Panel-openresty-npAh nginx -s reload   # 一般不需要，静态文件直接生效
+```
+
+## 更新安装包
+
+```bash
+# 1) 本地打包（Linux 上交叉打包 Windows）
+npm install
+npx electron-packager . XiaoyinMarkdown --platform=win32 --arch=x64 --out=dist \
+  --overwrite --asar --icon=build/icon.ico --app-version=2.6.1 \
+  --ignore="^/dist" --ignore="^/tools" --ignore="^/build" --ignore="^/site" \
+  --ignore="^/src-tauri" --ignore="^/\\.git"
+
+# 2) 压缩并发布
+cd dist && zip -qr -9 XiaoyinMarkdown-win32-x64.zip XiaoyinMarkdown-win32-x64 && cd ..
+cp dist/XiaoyinMarkdown-win32-x64.zip \
+   /opt/1panel/www/sites/md.wangjinding.com/index/download/
+```
+
+## 坑
+
+- **WAF 白名单**：不往 `sites.json` 加 `{"key": "<域名>", "host": ["<域名>:8082"]}`，
+  就会**本机 200、公网 403「网站不存在」**（本次踩过）。
+- **EdgeOne 过渡期**：新加速域名 `process` 状态下访问会被边缘直接 Reset（curl 显示 000），
+  证书 `applying → processing → deployed`，全程约 10–15 分钟，别当成配错了。
+- **缓存**：站点级策略是 NoCache，152MB 的安装包每次都回源（走家宽上行）。
+  要提速得在 EdgeOne 给 `/download/*` 单独加缓存规则。
+- **带宽账**：EO 免费额度 50GB/月，单次下载 152MB → 每月约 330 次。
