@@ -1,13 +1,13 @@
 {
-  "version": "2.6.3",
-  "notes": "更新入口改到状态栏右下角（蓝色「检查更新」文字链接），工具条上的更新图标去掉。\n升级弹窗不再显示当前版本，按钮居中。版本号提示保持简洁。",
-  "pub_date": "2026-11-20T02:43:08Z",
+  "version": "2.6.4",
+  "notes": "① 更新入口在状态栏右下角，蓝色「检查更新」\n② 弹窗里不再显示当前版本，按钮居中\n③ 更新说明按序号换行，发布时间改为本地时间",
+  "pub_date": "2026-11-20T02:54:40Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN2pDQXcvUEM5WGhyOTluTlB3NTRGMlZ6TEpBTDNFWHQzNXNkcmU3QlY3WHJJSVYvSUUzSjRNZFRGSDdyb1VGZ2R0MkU1UUZ2V1NjYU1FMTNjbEl0d0FZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQyNDE2CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi4zX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuMwp0U2JUdDlvd3Z1MzYxUE41VW10dTJFRjNNeDgvTXhRVWJMSWovdVFKSmtnUG8vM2lFNUxJa3Axa3lWMnd5NmRheEtMWlBJOXVDZGVvWm8yL0J5bGdDZz09Cg==",
-      "url": "https://md.wangjinding.com/download/xymd_2.6.3.exe",
-      "size": 2315317,
-      "sha256": "d50922f3dfc5e7315a6fe8466bcf593fd5adda2a7d10d3211e389e219fc02ce8"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN3ZFem9TQ1U0VlQyalQzNXM1K3FSVlpJVEN3aXFYUFQ2REt5WGxLb1l2OUVzUmovNjFHclk0bDcxWWhpUFdNTzVzNXJ4U1BDa1YvYVhOUXZOelllM1EwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQzMTk5CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi40X3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuNAp4UDB5c0lvQmlWSW83ZFVDaHFGY1JLY3BRR2J5elRoQjdoWXpqWllka1c0cEVDRzcxMzJNTlRvSW1pTS9EZ0JTNWNCWnVhVlA2d0M4eFU1a1o4b2dDZz09Cg==",
+      "url": "https://md.wangjinding.com/download/xymd_2.6.4.exe",
+      "size": 2324082,
+      "sha256": "c83cfcd98770db28fc9fb385d268fbd4a7b6831690ce88dd7fff0bd069ce52c4"
     }
   }
 }

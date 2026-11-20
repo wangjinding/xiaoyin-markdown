@@ -1,6 +1,6 @@
 [package]
 name = "xiaoyin-markdown"
-version = "2.6.3"
+version = "2.6.4"
 description = "小银 Markdown —— 轻量本地 Markdown 编辑器"
 edition = "2021"
 
@@ -15,6 +15,7 @@ tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
 serde = { version = "1", features = ["derive"] }
+chrono = "0.4"
 serde_json = "1"
 clipboard-win = "5"
 windows-sys = { version = "0.61", features = [

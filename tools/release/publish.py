@@ -49,8 +49,11 @@ def sha256(path: Path) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--notes", default="", help="更新说明（会显示在客户的升级弹窗里）")
+    ap.add_argument("--notes-file", default="", help="从文件读更新说明，多行编号时用，避免命令行转义")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+    if args.notes_file:
+        args.notes = Path(args.notes_file).read_text(encoding="utf-8").strip()
 
     version = conf_version()
     setup = NSIS_DIR / f"XiaoyinMarkdown_{version}_x64-setup.exe"

@@ -485,7 +485,15 @@ async fn check_update(app: AppHandle) -> Result<UpdateStatus, String> {
             current,
             version: u.version.clone(),
             notes: u.body.clone().unwrap_or_default(),
-            date: u.date.map(|d| d.to_string()).unwrap_or_default(),
+            // u.date 是 time::OffsetDateTime（UTC）。默认 Display 是 "2:43:08.0 +00:00:00"，
+            // 这里按时间戳转成本地时间，精确到分钟。
+            date: u
+                .date
+                .and_then(|d| {
+                    chrono::DateTime::from_timestamp(d.unix_timestamp(), 0)
+                        .map(|c| c.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M").to_string())
+                })
+                .unwrap_or_default(),
         }),
         Ok(None) => Ok(UpdateStatus {
             available: false,

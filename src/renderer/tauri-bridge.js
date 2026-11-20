@@ -33,7 +33,8 @@
       box.appendChild(msg);
       if (o.detail) {
         const d = document.createElement('div');
-        d.style.cssText = 'opacity:.7;margin-bottom:14px;line-height:1.5;';
+        // pre-wrap：更新说明是多行编号，不保留换行会被压成一坨
+        d.style.cssText = 'opacity:.72;margin-bottom:14px;line-height:1.7;white-space:pre-wrap;';
         d.textContent = o.detail;
         box.appendChild(d);
       }
