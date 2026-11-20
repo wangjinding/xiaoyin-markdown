@@ -563,7 +563,8 @@ fn app_version(app: AppHandle) -> String {
     app.package_info().version.to_string()
 }
 
-/// 查 https://md.wangjinding.com/update/latest.json 有没有比当前新的版本。
+/// 查 https://xymd.wangjinding.com/update/latest.json 有没有比当前新的版本。
+/// （旧域名 md.wangjinding.com 在 tauri.conf.json 里作为兜底 endpoint 保留，别删）
 /// 用官方 updater 插件：带 minisign 签名校验，装的是签名过的安装包，避免被中间人替换。
 #[tauri::command]
 async fn check_update(app: AppHandle) -> Result<UpdateStatus, String> {
