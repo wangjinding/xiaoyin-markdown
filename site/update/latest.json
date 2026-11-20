@@ -1,0 +1,13 @@
+{
+  "version": "2.6.2",
+  "notes": "新增「在线升级」：点一下就能检查新版本并自动覆盖安装、重启。\n官网地址 https://md.wangjinding.com/update/latest.json\n\n本次还包含：\n· 工具条新增升级按钮（发现新版本时弹窗，可看更新说明）\n· 下载走签名校验，安装包被篡改会被拒绝",
+  "pub_date": "2026-11-20T02:20:53Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN2l5cDhYZE1RbW5weXRjUkdsQTdVOS9KL2VDRElIelpZd0trT1pQTG5sZVNWWFJNRExIcWs4R2VDRVFlTWExYk9HQ01LbXJoVzZmMWpRQm9HQU1ZZ0FjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQxMTUwCWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi4yX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuMgpJOVZmM0c4bG9sSXE3UlRjRGdtamZkemVnMVZhand3cTBES2VsSFUyS1Zad0gzNWdZU3lIMnVqSHkzZGtkdkdGcThHZUdmUEFJc1d4QVFyeFUrbXdEdz09Cg==",
+      "url": "https://md.wangjinding.com/download/XiaoyinMarkdown_2.6.2_x64-setup.exe",
+      "size": 2314969,
+      "sha256": "61baa671049fb60886ec11c0d6d086da9cd6cebacfbf2f78c1be574853801223"
+    }
+  }
+}

@@ -459,6 +459,75 @@ fn migrate_apply(app: AppHandle, mode: String, docs: Vec<serde_json::Value>, kee
     Ok(())
 }
 
+/* ---------------- 在线升级 ---------------- */
+
+/// 检查结果回给前端：available=false 时 version 就是当前版本
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct UpdateStatus {
+    available: bool,
+    current: String,
+    version: String,
+    notes: String,
+    date: String,
+}
+
+/// 查 https://md.wangjinding.com/update/latest.json 有没有比当前新的版本。
+/// 用官方 updater 插件：带 minisign 签名校验，装的是签名过的安装包，避免被中间人替换。
+#[tauri::command]
+async fn check_update(app: AppHandle) -> Result<UpdateStatus, String> {
+    use tauri_plugin_updater::UpdaterExt;
+    let current = app.package_info().version.to_string();
+    let updater = app.updater().map_err(|e| format!("初始化升级器失败：{e}"))?;
+    match updater.check().await {
+        Ok(Some(u)) => Ok(UpdateStatus {
+            available: true,
+            current,
+            version: u.version.clone(),
+            notes: u.body.clone().unwrap_or_default(),
+            date: u.date.map(|d| d.to_string()).unwrap_or_default(),
+        }),
+        Ok(None) => Ok(UpdateStatus {
+            available: false,
+            version: current.clone(),
+            current,
+            notes: String::new(),
+            date: String::new(),
+        }),
+        Err(e) => Err(format!("检查更新失败：{e}")),
+    }
+}
+
+/// 下载 + 校验签名 + 跑安装包覆盖安装，然后重启自己。
+/// 进度通过 `update-progress` 事件推给前端（chunk 为已下载字节，total 可能为 null）。
+#[tauri::command]
+async fn install_update(app: AppHandle) -> Result<(), String> {
+    use tauri_plugin_updater::UpdaterExt;
+    let updater = app.updater().map_err(|e| format!("初始化升级器失败：{e}"))?;
+    let found = updater.check().await.map_err(|e| format!("检查更新失败：{e}"))?;
+    let Some(update) = found else {
+        return Err("已经是最新版本".into());
+    };
+    let handle = app.clone();
+    let mut downloaded: u64 = 0;
+    update
+        .download_and_install(
+            move |chunk: usize, total: Option<u64>| {
+                downloaded += chunk as u64;
+                let _ = handle.emit(
+                    "update-progress",
+                    serde_json::json!({ "downloaded": downloaded, "total": total }),
+                );
+            },
+            || {},
+        )
+        .await
+        .map_err(|e| format!("下载或安装失败：{e}"))?;
+    // 安装包已静默跑完并覆盖了程序，重启到新版本
+    let _ = app.emit("update-restarting", serde_json::json!({}));
+    app.restart();
+}
+
 /* ---------------- 入口 ---------------- */
 
 fn main() {
@@ -491,6 +560,8 @@ fn main() {
                 }
             }
         }))
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .invoke_handler(tauri::generate_handler![
             read_text_file,
             write_text_file,
@@ -507,7 +578,9 @@ fn main() {
             open_new_window,
             force_close,
             get_window_count,
-            migrate_apply
+            migrate_apply,
+            check_update,
+            install_update
         ])
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {

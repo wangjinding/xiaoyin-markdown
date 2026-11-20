@@ -158,6 +158,95 @@
     }
   });
 
+
+  /* ---------- 在线升级（服务端：https://md.wangjinding.com/update/latest.json） ---------- */
+  const updateBtn = document.getElementById('btn-update');
+  if (updateBtn) {
+    updateBtn.hidden = false;
+    updateBtn.addEventListener('click', runUpdate);
+  }
+
+  /* 升级进度浮层 */
+  function progressUI(title) {
+    const mask = document.createElement('div');
+    mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:99998;'
+      + 'display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;color:#222;border-radius:12px;padding:24px 26px;'
+      + 'width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);';
+    const t = document.createElement('div');
+    t.style.cssText = 'font-size:14px;font-weight:600;margin-bottom:14px;';
+    t.textContent = title;
+    const track = document.createElement('div');
+    track.style.cssText = 'height:6px;border-radius:4px;background:#eceef3;overflow:hidden;';
+    const bar = document.createElement('div');
+    bar.style.cssText = 'height:100%;width:6%;background:linear-gradient(90deg,#3a7bfc,#0b66dd);'
+      + 'transition:width .25s ease;';
+    track.appendChild(bar);
+    const sub = document.createElement('div');
+    sub.style.cssText = 'margin-top:10px;font-size:12.5px;color:#7a8494;';
+    sub.textContent = '正在下载…';
+    box.append(t, track, sub);
+    mask.appendChild(box);
+    document.body.appendChild(mask);
+    return {
+      set(p) {
+        if (!p) return;
+        if (p.done) { bar.style.width = '100%'; sub.textContent = '安装完成，正在重启…'; return; }
+        const d = p.downloaded || 0;
+        const total = p.total || 0;
+        if (total > 0) {
+          bar.style.width = Math.min(100, (d / total) * 100).toFixed(1) + '%';
+          sub.textContent = `${(d / 1048576).toFixed(1)} / ${(total / 1048576).toFixed(1)} MB`;
+        } else {
+          sub.textContent = `${(d / 1048576).toFixed(1)} MB`;
+        }
+      },
+      close() { mask.remove(); },
+    };
+  }
+
+  async function runUpdate() {
+    if (!updateBtn || updateBtn.disabled) return;
+    updateBtn.disabled = true;
+    try {
+      const st = await invoke('check_update');
+      if (!st || !st.available) {
+        await modalDialog({
+          message: '已是最新版本',
+          detail: `当前版本 v${(st && st.current) || ''}`,
+          buttons: ['好'],
+        });
+        return;
+      }
+      const lines = [`当前 v${st.current}  →  新版本 v${st.version}`];
+      if (st.date) lines.push(`发布时间：${st.date}`);
+      if (st.notes) lines.push('', '更新说明：', st.notes);
+      const pick = await modalDialog({
+        message: `发现新版本 v${st.version}`,
+        detail: lines.join('\n'),
+        buttons: ['立即升级', '稍后'],
+      });
+      if (pick !== 0) return;
+
+      const ui = progressUI(`正在升级到 v${st.version}…`);
+      let un = null;
+      try {
+        un = await listen('update-progress', (e) => ui.set(e.payload));
+        await invoke('install_update');
+        ui.set({ done: true });
+      } catch (e) {
+        if (un) un();
+        ui.close();
+        await modalDialog({ message: '升级失败', detail: String((e && e.message) || e), buttons: ['好'] });
+      }
+    } catch (e) {
+      await modalDialog({ message: '检查更新失败', detail: String((e && e.message) || e), buttons: ['好'] });
+    } finally {
+      updateBtn.disabled = false;
+    }
+  }
+
   /* ---------- 拖放（Tauri 系统级，拿得到真实路径） ---------- */
   cur.onDragDropEvent((e) => {
     const p = e.payload;
