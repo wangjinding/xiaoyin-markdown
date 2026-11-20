@@ -1,13 +1,13 @@
 {
-  "version": "2.6.2",
-  "notes": "新增「在线升级」：点一下就能检查新版本并自动覆盖安装、重启。\n官网地址 https://md.wangjinding.com/update/latest.json\n\n本次还包含：\n· 工具条新增升级按钮（发现新版本时弹窗，可看更新说明）\n· 下载走签名校验，安装包被篡改会被拒绝",
-  "pub_date": "2026-11-20T02:29:06Z",
+  "version": "2.6.3",
+  "notes": "更新入口改到状态栏右下角（蓝色「检查更新」文字链接），工具条上的更新图标去掉。\n升级弹窗不再显示当前版本，按钮居中。版本号提示保持简洁。",
+  "pub_date": "2026-11-20T02:42:06Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN2l5cDhYZE1RbW5weXRjUkdsQTdVOS9KL2VDRElIelpZd0trT1pQTG5sZVNWWFJNRExIcWs4R2VDRVFlTWExYk9HQ01LbXJoVzZmMWpRQm9HQU1ZZ0FjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQxMTUwCWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi4yX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuMgpJOVZmM0c4bG9sSXE3UlRjRGdtamZkemVnMVZhand3cTBES2VsSFUyS1Zad0gzNWdZU3lIMnVqSHkzZGtkdkdGcThHZUdmUEFJc1d4QVFyeFUrbXdEdz09Cg==",
-      "url": "https://md.wangjinding.com/download/xymd_2.6.2.exe",
-      "size": 2314969,
-      "sha256": "61baa671049fb60886ec11c0d6d086da9cd6cebacfbf2f78c1be574853801223"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN2pDQXcvUEM5WGhyOTluTlB3NTRGMlZ6TEpBTDNFWHQzNXNkcmU3QlY3WHJJSVYvSUUzSjRNZFRGSDdyb1VGZ2R0MkU1UUZ2V1NjYU1FMTNjbEl0d0FZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQyNDE2CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi4zX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuMwp0U2JUdDlvd3Z1MzYxUE41VW10dTJFRjNNeDgvTXhRVWJMSWovdVFKSmtnUG8vM2lFNUxJa3Axa3lWMnd5NmRheEtMWlBJOXVDZGVvWm8yL0J5bGdDZz09Cg==",
+      "url": "https://md.wangjinding.com/download/xymd_2.6.3.exe",
+      "size": 2315317,
+      "sha256": "d50922f3dfc5e7315a6fe8466bcf593fd5adda2a7d10d3211e389e219fc02ce8"
     }
   }
 }

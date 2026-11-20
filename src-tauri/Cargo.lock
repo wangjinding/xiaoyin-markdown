@@ -5368,7 +5368,7 @@ dependencies = [
 
 [[package]]
 name = "xiaoyin-markdown"
-version = "2.6.2"
+version = "2.6.3"
 dependencies = [
  "clipboard-win",
  "serde",

@@ -699,6 +699,10 @@ html[data-theme="dark"] .markdown-body code { color: #f0a1c0; }
   color: var(--text-faint);
 }
 .st-left, .st-right { display: flex; align-items: center; gap: 8px; }
+/* 状态栏里的「检查更新」文字链接 */
+.st-link { color: var(--accent); cursor: pointer; text-decoration: none; }
+.st-link:hover { text-decoration: underline; }
+.st-link.busy { opacity: .5; pointer-events: none; }
 .st-file { color: var(--text-dim); max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .st-dirty {
   padding: 1px 6px;

@@ -38,7 +38,7 @@
         box.appendChild(d);
       }
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;';
+      row.style.cssText = 'display:flex;gap:10px;justify-content:center;margin-top:4px;';
       buttons.forEach((label, i) => {
         const b = document.createElement('button');
         b.textContent = label;
@@ -161,10 +161,8 @@
 
   /* ---------- 在线升级（服务端：https://md.wangjinding.com/update/latest.json） ---------- */
   const updateBtn = document.getElementById('btn-update');
-  if (updateBtn) {
-    updateBtn.hidden = false;
-    updateBtn.addEventListener('click', runUpdate);
-  }
+  if (updateBtn) updateBtn.addEventListener('click', runUpdate);
+  let updating = false;
 
   /* 升级进度浮层 */
   function progressUI(title) {
@@ -207,21 +205,18 @@
   }
 
   async function runUpdate() {
-    if (!updateBtn || updateBtn.disabled) return;
-    updateBtn.disabled = true;
+    if (!updateBtn || updating) return;
+    updating = true;
+    updateBtn.classList.add('busy');
     try {
       const st = await invoke('check_update');
       if (!st || !st.available) {
-        await modalDialog({
-          message: '已是最新版本',
-          detail: `当前版本 v${(st && st.current) || ''}`,
-          buttons: ['好'],
-        });
+        await modalDialog({ message: '已是最新版本', buttons: ['好'] });
         return;
       }
-      const lines = [`当前 v${st.current}  →  新版本 v${st.version}`];
+      const lines = [];
       if (st.date) lines.push(`发布时间：${st.date}`);
-      if (st.notes) lines.push('', '更新说明：', st.notes);
+      if (st.notes) lines.push('', st.notes);
       const pick = await modalDialog({
         message: `发现新版本 v${st.version}`,
         detail: lines.join('\n'),
@@ -243,7 +238,8 @@
     } catch (e) {
       await modalDialog({ message: '检查更新失败', detail: String((e && e.message) || e), buttons: ['好'] });
     } finally {
-      updateBtn.disabled = false;
+      updating = false;
+      updateBtn.classList.remove('busy');
     }
   }
 
