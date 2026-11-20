@@ -1,7 +1,7 @@
 {
   "name": "xiaoyin-markdown-editor",
   "productName": "XiaoyinMarkdown",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "description": "轻量本地 Markdown 编辑器：实时预览、多标签/多窗口、查找高亮、右键复制全文/打开目录、常用快捷键",
   "main": "src/main.js",
   "author": "小银",

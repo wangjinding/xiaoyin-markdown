@@ -1,28 +1,28 @@
-# 官网部署说明（md.wangjinding.com）
+# 官网部署说明（xymd.wangjinding.com）
 
 ## 链路
 
 ```
-访客 ──https://md.wangjinding.com:443──► EdgeOne 边缘（免费 TrustAsia 证书）
+访客 ──https://xymd.wangjinding.com:443──► EdgeOne 边缘（免费 TrustAsia 证书）
                                           │ 回源 HTTPS 8443，Host=加速域名
                                           ▼
                              <回源域名>:8443 ──(光猫映射)──► .8 的 OpenResty
                                                                         │ server_name 分流
                                                                         ▼
-                                                              /opt/1panel/www/sites/md.wangjinding.com/index
+                                                              /opt/1panel/www/sites/<域名>/index
 ```
 
 ## 各部分落在哪
 
 | 环节 | 位置 / 参数 |
 | --- | --- |
-| 站点根目录 | `/opt/1panel/www/sites/md.wangjinding.com/index` |
-| nginx 配置 | `/opt/1panel/www/conf.d/md.wangjinding.com.conf`（8082 + 8443 ssl）|
-| 源站证书 | `/opt/1panel/www/sites/md.wangjinding.com/ssl/`（acme.sh + 阿里云 DNS-01，自动续期）|
+| 站点根目录 | `/opt/1panel/www/sites/<域名>/index` |
+| nginx 配置 | `/opt/1panel/www/conf.d/<域名>.conf`（8082 + 8443 ssl）|
+| 源站证书 | `/opt/1panel/www/sites/<域名>/ssl/`（acme.sh + 阿里云 DNS-01，自动续期）|
 | 安装包 | `index/download/XiaoyinMarkdown-win32-x64.zip` |
-| EdgeOne | zone `zone-xxxxxxxx`，加速域名 `md.wangjinding.com`，回源 HTTPS/8443 |
-| WAF 白名单 | `1pwaf/data/conf/sites.json` + `1pwaf/data/sites/md.wangjinding.com/config.json` |
-| DNS | 阿里云 `md` CNAME → `md.wangjinding.com.eo.dnse2.com`（TTL 600）|
+| EdgeOne | zone `zone-xxxxxxxx`，加速域名 `xymd.wangjinding.com`，回源 HTTPS/8443 |
+| WAF 白名单 | `1pwaf/data/conf/sites.json` + `1pwaf/data/sites/xymd.wangjinding.com/config.json` |
+| DNS | 阿里云 `xymd` CNAME → `xymd.wangjinding.com.eo.dnse2.com`（TTL 600）|
 
 
 ## 在 1Panel 面板里可见（重要）
@@ -34,7 +34,7 @@
 ```sql
 -- websites：type='static'，proxy 留空，site_dir='/'
 insert into websites (..., protocol, primary_domain, type, alias, status, http_config, proxy, site_dir, ...)
-values (..., 'HTTPS', 'md.wangjinding.com', 'static', 'md.wangjinding.com', 'Running',
+values (..., 'HTTPS', 'xymd.wangjinding.com', 'static', 'xymd.wangjinding.com', 'Running',
         'HTTPToHTTPS', '', '/', ...);
 -- website_domains：(website_id, domain, ssl=0, port=8082)
 -- website_ssls：(primary_domain, private_key, pem, key_type='EC256', type='YE2',
@@ -48,12 +48,12 @@ values (..., 'HTTPS', 'md.wangjinding.com', 'static', 'md.wangjinding.com', 'Run
 - 面板刷新后即可见（Ctrl+F5）；若没出现，`systemctl restart 1panel-agent` 一次。
 - ⚠️ **在面板里改这个站点的配置时，nginx conf 会被面板模板重写** ——
   我加的 `Strict-Transport-Security` 头、`/download/` 的 `Content-Disposition: attachment`
-  可能会丢，改完记得复查 `conf.d/md.wangjinding.com.conf`。
+  可能会丢，改完记得复查 `conf.d/xymd.wangjinding.com.conf`。
 
 ## 更新页面
 
 ```bash
-cp site/index.html /opt/1panel/www/sites/md.wangjinding.com/index/
+cp site/index.html /opt/1panel/www/sites/<域名>/index/
 docker exec 1Panel-openresty-npAh nginx -s reload   # 一般不需要，静态文件直接生效
 ```
 
@@ -68,9 +68,9 @@ npx tauri build --target x86_64-pc-windows-gnu --bundles nsis
 # 2) 发布
 R=src-tauri/target/x86_64-pc-windows-gnu/release
 cp $R/bundle/nsis/XiaoyinMarkdown_2.6.1_x64-setup.exe \
-   /opt/1panel/www/sites/md.wangjinding.com/index/download/
+   /opt/1panel/www/sites/<域名>/index/download/
 cp $R/xiaoyin-markdown.exe \
-   /opt/1panel/www/sites/md.wangjinding.com/index/download/XiaoyinMarkdown-portable.exe
+   /opt/1panel/www/sites/<域名>/index/download/XiaoyinMarkdown-portable.exe
 ```
 
 旧版 Electron 构建（`XiaoyinMarkdown-win32-x64.zip`）仍保留在 `download/` 里。

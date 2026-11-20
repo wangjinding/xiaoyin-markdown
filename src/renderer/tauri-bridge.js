@@ -160,7 +160,7 @@
   });
 
 
-  /* ---------- 在线升级（服务端：https://md.wangjinding.com/update/latest.json） ---------- */
+  /* ---------- 在线升级（服务端：https://xymd.wangjinding.com/update/latest.json） ---------- */
   const updateBtn = document.getElementById('btn-update');
   if (updateBtn) updateBtn.addEventListener('click', runUpdate);
   let updating = false;

@@ -13,7 +13,7 @@
 升级清单是**合并**的：只更新这次扫到的平台，其它平台的条目原样保留
 （这样在 Windows 上发版不会把 macOS 的那条冲掉）。
 
-客户端拉取：https://md.wangjinding.com/update/latest.json
+客户端拉取：https://xymd.wangjinding.com/update/latest.json
 """
 from __future__ import annotations
 
@@ -29,10 +29,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / "site"
-SITE_ROOT = Path("/opt/1panel/www/sites/md.wangjinding.com/index")
+SITE_ROOT = Path("/opt/1panel/www/sites/<域名>/index")
 SITE_DOWNLOAD = SITE_ROOT / "download"
 SITE_UPDATE = SITE_ROOT / "update"
-BASE_URL = "https://md.wangjinding.com"
+BASE_URL = "https://xymd.wangjinding.com"
 TARGETS = ROOT / "src-tauri" / "target"
 
 
@@ -57,9 +57,21 @@ def find_one(patterns: list[str]) -> Path | None:
     return None
 
 
+
+def artifact_version(path: Path) -> str | None:
+    """从文件名里抠出构建版本，如 XiaoyinMarkdown_2.6.6_x64-setup.exe → 2.6.6"""
+    m = re.search(r"_(\d+\.\d+\.\d+)", path.name)
+    return m.group(1) if m else None
+
+
 def collect():
-    """返回 [{platform, artifact, sig, dl_name}]，只包含本机实际构建出来的。"""
+    """返回 [{platform, artifact, sig, dl_name}]，只包含本机实际构建出来的。
+
+    只收**版本号对得上**的产物 —— 否则上一版留在 target/ 里的旧包会被
+    改名成新版本发出去（清单写新版本、二进制还是旧版，升级会静默失败）。
+    """
     found = []
+    want = conf_version()
 
     # ── Windows ──
     exe = find_one([
@@ -88,7 +100,15 @@ def collect():
             arch = "aarch64" if "aarch64" in triple else "x64"
             found.append({"platform": f"{key}-dmg", "artifact": dmg, "sig": None, "ext": f"_{arch}.dmg"})
 
-    return found
+    # 过滤掉版本对不上的旧产物
+    kept = []
+    for it in found:
+        v = artifact_version(it["artifact"])
+        if v and v != want:
+            print(f"  ⏭  跳过 {it['artifact'].name}（版本 {v} ≠ 当前 {want}）")
+            continue
+        kept.append(it)
+    return kept
 
 
 def main() -> int:
