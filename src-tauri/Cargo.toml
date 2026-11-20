@@ -1,6 +1,6 @@
 [package]
 name = "xiaoyin-markdown"
-version = "2.6.4"
+version = "2.6.5"
 description = "小银 Markdown —— 轻量本地 Markdown 编辑器"
 edition = "2021"
 

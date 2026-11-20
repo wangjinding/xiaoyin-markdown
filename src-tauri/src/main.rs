@@ -472,6 +472,12 @@ struct UpdateStatus {
     date: String,
 }
 
+/// 当前程序版本（状态栏显示用，不联网）
+#[tauri::command]
+fn app_version(app: AppHandle) -> String {
+    app.package_info().version.to_string()
+}
+
 /// 查 https://md.wangjinding.com/update/latest.json 有没有比当前新的版本。
 /// 用官方 updater 插件：带 minisign 签名校验，装的是签名过的安装包，避免被中间人替换。
 #[tauri::command]
@@ -587,6 +593,7 @@ fn main() {
             force_close,
             get_window_count,
             migrate_apply,
+            app_version,
             check_update,
             install_update
         ])

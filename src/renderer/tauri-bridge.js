@@ -165,6 +165,14 @@
   if (updateBtn) updateBtn.addEventListener('click', runUpdate);
   let updating = false;
 
+  // 状态栏显示当前版本（静态值只是兜底，这里用真实版本覆盖）
+  const verEl = document.getElementById('st-ver');
+  if (verEl) {
+    invoke('app_version')
+      .then((v) => { if (v) verEl.textContent = 'v' + v; })
+      .catch(() => {});
+  }
+
   /* 升级进度浮层 */
   function progressUI(title) {
     const mask = document.createElement('div');

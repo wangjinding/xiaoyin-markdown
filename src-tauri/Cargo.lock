@@ -5370,7 +5370,7 @@ dependencies = [
 
 [[package]]
 name = "xiaoyin-markdown"
-version = "2.6.4"
+version = "2.6.5"
 dependencies = [
  "chrono",
  "clipboard-win",
