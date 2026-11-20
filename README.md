@@ -149,7 +149,7 @@ npx electron-packager . XiaoyinMarkdown --platform=win32 --arch=x64 --out=dist ^
 
 ## 用 Tauri 打包（推荐的安装包）
 
-Tauri 版走系统 WebView2，**安装包只有 1.6 MB**（Electron 版 152 MB）。
+Tauri 版走系统 WebView2，**不用捆绑运行时**，安装包比 Electron 版小一个数量级。
 在 Linux 上也能交叉编译出 Windows 安装包：
 
 ```bash

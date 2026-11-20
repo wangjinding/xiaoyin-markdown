@@ -59,7 +59,7 @@ docker exec 1Panel-openresty-npAh nginx -s reload   # 一般不需要，静态�
 
 ## 更新安装包
 
-官网主下载项是 **Tauri 安装包**（1.6 MB，装完 .md 默认用它打开）：
+官网主下载项是 **Tauri 安装包**（装完 .md 默认用它打开）：
 
 ```bash
 # 1) 交叉编译 Windows 安装包（详见仓库 README「用 Tauri 打包」）
@@ -73,7 +73,7 @@ cp $R/xiaoyin-markdown.exe \
    /opt/1panel/www/sites/md.wangjinding.com/index/download/XiaoyinMarkdown-portable.exe
 ```
 
-旧版 Electron 构建（`XiaoyinMarkdown-win32-x64.zip`，152 MB）仍保留在 `download/` 里。
+旧版 Electron 构建（`XiaoyinMarkdown-win32-x64.zip`）仍保留在 `download/` 里。
 
 ## 坑
 
@@ -81,6 +81,8 @@ cp $R/xiaoyin-markdown.exe \
   就会**本机 200、公网 403「网站不存在」**（本次踩过）。
 - **EdgeOne 过渡期**：新加速域名 `process` 状态下访问会被边缘直接 Reset（curl 显示 000），
   证书 `applying → processing → deployed`，全程约 10–15 分钟，别当成配错了。
-- **缓存**：站点级策略是 NoCache，152MB 的安装包每次都回源（走家宽上行）。
+- **缓存**：站点级策略是 NoCache，主安装包（Tauri 版，2 MB 左右）每次回源压力不大；
+  但旧的 Electron 包有 152MB，有人下就整包走家宽上行。
   要提速得在 EdgeOne 给 `/download/*` 单独加缓存规则。
-- **带宽账**：EO 免费额度 50GB/月，单次下载 152MB → 每月约 330 次。
+- **带宽账**：EO 免费额度 50GB/月。按 2 MB 的 Tauri 包算够下两万多次；
+  按 152MB 的 Electron 包算只有 330 次左右 —— 所以主下载项别指回 Electron 包。
