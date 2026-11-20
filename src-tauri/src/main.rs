@@ -564,7 +564,7 @@ fn app_version(app: AppHandle) -> String {
 }
 
 /// 查 https://xymd.wangjinding.com/update/latest.json 有没有比当前新的版本。
-/// （旧域名 md.wangjinding.com 在 tauri.conf.json 里作为兜底 endpoint 保留，别删）
+/// 旧域名 md.wangjinding.com 已于 2026-11-20 停用（EdgeOne / 1Panel / DNS 全部删除）。
 /// 用官方 updater 插件：带 minisign 签名校验，装的是签名过的安装包，避免被中间人替换。
 #[tauri::command]
 async fn check_update(app: AppHandle) -> Result<UpdateStatus, String> {

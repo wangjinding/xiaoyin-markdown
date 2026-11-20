@@ -1,5 +1,11 @@
 # 官网部署说明（xymd.wangjinding.com）
 
+> **2026-11-20 域名迁移完成**：官网从 `md.wangjinding.com` 迁到 `xymd.wangjinding.com`。
+> 旧域名已**彻底下线** —— EdgeOne 加速域名、1Panel 站点、WAF 条目、DNS 记录、acme 证书全部删除。
+> 站点根目录现在是真的独立目录（`/opt/1panel/www/sites/<域名>/index`），
+> 不再是软链，删旧站不会影响新站。
+
+
 ## 链路
 
 ```

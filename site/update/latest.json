@@ -1,19 +1,19 @@
 {
-  "version": "2.6.6",
-  "notes": "① 官网域名迁移到 xymd.wangjinding.com（旧域名继续可用，不影响你升级）\n② 软件内「检查更新」改为连新地址，旧地址保留为备用\n③ 本次没有功能变化，只有域名相关改动",
-  "pub_date": "2026-11-20T06:58:42Z",
+  "version": "2.6.7",
+  "notes": "① 官网改为 xymd.wangjinding.com，旧域名已彻底下线\n② 软件内「检查更新」只连新地址（旧的兜底地址已移除）\n③ 没有功能变化",
+  "pub_date": "2026-11-20T07:18:19Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN29ZZXljdmVmamMxWnRXNDdnNTNLQUY0SHJVT0ZpQVB0WUg0WDkxL2wzaUwzRUdSSHFwVHRjV25VN0RnVWVhQ1ZjMG8zcGowUkNaMXZZQkJKRkczWmdJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTU3NDg4CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi42X3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuNgp5WEJMeHRCWWpuRmZBZitmSmJCSUpmdGw1cWlHdkRYTHVRbDhMUTFSdEJ6SU1WSjJZWEdOVzRkUXQxRjBOVmFydXd6VnpiZnhqYXhKR1B0N2lqenVEdz09Cg==",
-      "url": "https://xymd.wangjinding.com/download/xymd_2.6.6.exe",
-      "size": 2267277,
-      "sha256": "4912314ba93cc3da2d15a3902093149333147767d49392e2efb6a42e2111642b"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN3NRTEZtMm13Yyt2VklWaytPc0FvSzlWdHNpOHlqeUpWeHZiM3FJakJlTUh1NUlKbUM0aGpZTEs5My9lTEthdzhsTy9EblJpRUJZcDJDRURtN3c2YUE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTU4Nzk2CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi43X3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuNwpBUU9OT241MUFLcnRqRXB6Q1RQRERNTXdDNTZDTUlrN2xULzQ2MitXYWVsRmo3dFA1S2Z6WXRWRTR2a1JNOUtkYmFHbU5KRGllYk54eWFSR2JTR3VEZz09Cg==",
+      "url": "https://xymd.wangjinding.com/download/xymd_2.6.7.exe",
+      "size": 2267038,
+      "sha256": "f79909df58ea1c3dce666eca25f2eb62898a787af6e2acfe3576f60813dcaaf9"
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN2lNK1ljbko4dmVnNXBybTFwS0ZGRzVDVFpzUzVLaVM3Wk9NZFJPUHlHM0h5VW1YdWxRLy9ub0N3UG9NTGZBNFFka0hyWTlrbWtnckNJYm4rc0ZEZ1F3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTU3ODU4CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi42X2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi42LjYKK1p6MWFwazBQSndYV2c5Q0dLUysxQnE4dWNwYUhBSGt5Nms5bzhSeFRuOVRkK04xTW9yOUpSWUcyaDNlaGh5V1ZZYWNZVmJkTnIveTROVUZTOFJuQUE9PQo=",
-      "url": "https://xymd.wangjinding.com/download/xymd_2.6.6_amd64.AppImage",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN2sxemFOS0orTjU1clJtOE9jeXIrcWdtMTFrZnRNZUJTaTkyb1RPbWF1cHZkVi9CK3A4eVVTdmpnbkdXNXZEL25QK0puSTQrMTFGSnVnOHdiUnBHUWdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTU5MDc5CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi43X2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi42LjcKakgzakpsM3ZNOGFwUEZjaGxvbUdFSE82ZnVGNjdQSXNMVC9rUzBwR29nSnk0QlZXUlFxYUVJZUFEQ0tJSEJmK3hjRmI1SEw5MmlBanI1MkhPWUlXQ2c9PQo=",
+      "url": "https://xymd.wangjinding.com/download/xymd_2.6.7_amd64.AppImage",
       "size": 108648952,
-      "sha256": "079308cb14d1c8f0883cba812750db26494e43609b11796b0afe3eb3e5e4ff8e"
+      "sha256": "c559b4e64ca668898a15e22972622a19d5be96ac77adce96c4e60d60b6a90d5f"
     }
   }
 }

@@ -5503,7 +5503,7 @@ dependencies = [
 
 [[package]]
 name = "xiaoyin-markdown"
-version = "2.6.6"
+version = "2.6.7"
 dependencies = [
  "arboard",
  "chrono",
