@@ -66,7 +66,9 @@ def main() -> int:
     signature = sig_file.read_text(encoding="utf-8").strip()
     size = setup.stat().st_size
     digest = sha256(setup)
-    url = f"{BASE_URL}/download/{setup.name}"
+    # 下载文件名带版本号：xymd_2.6.2.exe（浏览器另存就是这个名）
+    dl_name = f"xymd_{version}.exe"
+    url = f"{BASE_URL}/download/{dl_name}"
 
     manifest = {
         "version": version,
@@ -111,7 +113,15 @@ def main() -> int:
     (SITE / "update").mkdir(parents=True, exist_ok=True)
     (SITE / "update" / "latest.json").write_text(body, encoding="utf-8")
 
-    # ④ 稳定别名：官网页固定链到 latest-setup.exe，发版不用改 HTML
+    # ④ 带版本号的文件名（浏览器另存为 xymd_<版本>.exe）
+    for name, real in ((dl_name, setup.name), (f"xymd_{version}_portable.exe", "XiaoyinMarkdown-portable.exe")):
+        link = SITE_DOWNLOAD / name
+        if link.is_symlink() or link.exists():
+            link.unlink()
+        if (SITE_DOWNLOAD / real).exists():
+            link.symlink_to(real)
+
+    # ⑤ 稳定别名：官网页固定链到 latest-setup.exe，发版不用改 HTML
     for alias, real in (("latest-setup.exe", setup.name), ("latest-portable.exe", "XiaoyinMarkdown-portable.exe")):
         link = SITE_DOWNLOAD / alias
         if link.is_symlink() or link.exists():
@@ -120,6 +130,7 @@ def main() -> int:
 
     print(f"\n  ✅ 已发布：{BASE_URL}/update/latest.json")
     print(f"  ✅ 稳定别名：{BASE_URL}/download/latest-setup.exe")
+    print(f"  ✅ 版本文件名：{url}")
     print(f"  ✅ 安装包：{url}")
     return 0
 
