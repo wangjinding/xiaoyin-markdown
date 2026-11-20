@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>小银 Markdown — 纯本地 Windows Markdown 编辑器</title>
-<meta name="description" content="小银 Markdown：纯本地的 Windows Markdown 编辑器，支持在线升级。实时预览、多标签/多窗口、章节大纲、查找高亮。不联网、不登录、不收集任何数据。">
+<title>小银 Markdown — 纯本地 Markdown 编辑器 · Windows / macOS / Linux</title>
+<meta name="description" content="小银 Markdown：纯本地的 Markdown 编辑器，Windows / macOS / Linux 三端同源。实时预览、多标签/多窗口、章节大纲、查找高亮，支持在线升级。不联网、不登录、不收集任何数据。">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" href="/favicon.png">
 <style>
@@ -81,8 +81,9 @@
     background:linear-gradient(96deg,var(--blue),var(--blue-d));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
+  .nw{white-space:nowrap}
   .kv-sub{
-    margin:24px auto 0;max-width:600px;font-size:clamp(15px,1.7vw,19px);color:var(--ink-2);line-height:1.75;
+    margin:24px auto 0;max-width:720px;font-size:clamp(15px,1.7vw,19px);color:var(--ink-2);line-height:1.75;
   }
   .kv-meta{margin-top:20px;font-size:14.5px;color:var(--ink-3);display:flex;gap:0;justify-content:center;flex-wrap:wrap}
   .kv-meta i{font-style:normal;padding:0 14px;border-right:1px solid var(--line)}
@@ -126,6 +127,14 @@
   .gal img{display:block;width:100%;height:auto}
   .gal figcaption{padding:16px 20px 18px;font-size:14.6px;color:var(--ink-2);line-height:1.65}
   .gal figcaption b{display:block;color:var(--ink);font-size:15.5px;margin-bottom:4px}
+
+  /* 平台信息 */
+  .plat{margin:0 0 22px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .plat-row{display:flex;gap:18px;align-items:flex-start;padding:15px 22px;border-bottom:1px solid var(--line);font-size:14.6px;color:var(--ink-2);line-height:1.7}
+  .plat-row:last-child{border-bottom:0}
+  .plat-row b{flex:none;width:82px;color:var(--ink);font-weight:700}
+  .plat-chip{display:inline-block;background:var(--blue-bg);color:var(--blue-d);border-radius:999px;padding:3px 12px;font-size:13.5px;font-weight:600;margin:0 6px 6px 0}
+  @media(max-width:640px){.plat-row{flex-direction:column;gap:6px}.plat-row b{width:auto}}
 
   /* ───────── 通用区块 ───────── */
   section{padding:96px 0}
@@ -259,8 +268,8 @@
     <div class="kv-tag"><i class="dot"></i><span>v<span data-ver>2.6.5</span> 已发布 · <b>支持在线升级</b></span></div>
     <h1>写 Markdown，<br><em>就是好用！</em></h1>
     <p class="kv-sub">
-      一个纯本地的 Windows Markdown 编辑器。左边写、右边看，实时预览、多标签 / 多窗口、
-      章节大纲、查找高亮，打开就能写。
+      一个纯本地的 Markdown 编辑器，<span class="nw">Windows / macOS / Linux</span> <b class="nw">三端同源</b>。<br>
+      左边写、右边看，实时预览、多标签、章节大纲、查找高亮，打开就能写。
     </p>
     <div class="kv-meta">
       <i>基础功能全免费</i><i>不联网 · 不登录</i><i>不收集任何数据</i>
@@ -269,11 +278,11 @@
       <a class="btn btn-blue" data-dl="setup" href="/download/latest-setup.exe" download>↓ 免费下载</a>
       <a class="btn btn-line" href="#scene">看看功能</a>
     </div>
-    <p class="kv-plat">Windows 10 / 11 · x64 · 免安装版亦有</p>
+    <p class="kv-plat">Windows 10/11 · macOS 11+ · Linux x86_64 · 支持在线升级</p>
 
     <div class="badges">
       <div class="badge"><span class="tick">✓</span>纯本地运行</div>
-      <div class="badge"><span class="tick">✓</span>免装运行时</div>
+      <div class="badge"><span class="tick">✓</span>三端同源</div>
       <div class="badge"><span class="tick">✓</span>零依赖渲染引擎</div>
       <div class="badge"><span class="tick">✓</span>无账号 · 无遥测</div>
       <div class="badge"><span class="tick">✓</span>MIT 开源</div>
@@ -467,7 +476,7 @@
     <div class="dl-grid">
       <div class="dl-card primary">
         <h3>安装版</h3>
-        <div class="dl-size">Windows 10 / 11 · x64</div>
+        <div class="dl-size">Windows 10 / 11 · x64 · 安装包</div>
         <p>
           装完 <b>双击 .md 默认用它打开</b>（.markdown / .mdown / .mkd / .mdwn 同理），
           开始菜单有快捷方式，可在「设置 → 应用」里正常卸载。
@@ -514,7 +523,7 @@
     </div>
     <div class="note">
       <span class="note-ic">i</span>
-      <div>未做代码签名，首次运行 Windows SmartScreen 可能提示「未知发布者」，点「更多信息 → 仍要运行」即可。Windows 10 若缺 WebView2，安装程序会自动下载。</div>
+      <div>三个平台都<b>未做代码签名</b>：Windows 首次运行会提示「未知发布者」，点「更多信息 → 仍要运行」；macOS 需<b>右键 → 打开</b>（或在终端执行 <code>xattr -dr com.apple.quarantine /Applications/XiaoyinMarkdown.app</code>）。Windows 10 若缺 WebView2，安装程序会自动下载。</div>
     </div>
   </div>
 </section>
@@ -525,14 +534,41 @@
     <div class="sec-head">
       <h2>关于<em>小银 Markdown</em></h2>
       <p>
-        界面是自写的零依赖 Markdown 渲染引擎，桌面壳有两条：默认下载走 Tauri 2 + 系统 WebView2，
-        桌面能力由 Rust 直接调 Win32；仓库里还保留着 Electron 版。
+        Rust + Tauri 2，界面是同一套自写的零依赖 Markdown 渲染引擎 ——
+        Windows / macOS / Linux <b>三端同源</b>：一份渲染代码、一套快捷键、一致的界面。
       </p>
     </div>
+
+    <div class="plat">
+      <div class="plat-row">
+        <b>支持平台</b>
+        <span>
+          <span class="plat-chip">Windows 10 / 11 x64</span>
+          <span class="plat-chip">macOS 11+ · Apple Silicon / Intel</span>
+          <span class="plat-chip">Linux x86_64 · AppImage / deb</span>
+        </span>
+      </div>
+      <div class="plat-row">
+        <b>在线升级</b>
+        <span>软件内点状态栏右下角「检查更新」→ 下载 → 校验签名 → 覆盖安装 → 自动重启。</span>
+      </div>
+      <div class="plat-row">
+        <b>平台差异</b>
+        <span>文件树右键「复制文件」：Windows 复制的是<b>文件本身</b>（能直接粘到资源管理器 / 微信）；
+              macOS 与 Linux 的系统剪贴板没有通用文件格式，退化为复制<b>路径文本</b>。
+              「在文件管理器中显示」三端都支持。</span>
+      </div>
+      <div class="plat-row">
+        <b>体积</b>
+        <span>Windows 安装包约 2 MB、Linux deb 约 3 MB（用系统 WebView）；AppImage 与 dmg 为了免依赖
+              会自带运行时，会大很多。</span>
+      </div>
+    </div>
+
     <div class="grid">
-      <div class="card"><h3><span class="ico">✓</span>隐私</h3><p>不联网、不登录、不收集数据。唯一的网络行为是你点预览里的外部链接，交给系统浏览器打开。</p></div>
+      <div class="card"><h3><span class="ico">✓</span>隐私</h3><p>不联网、不登录、不收集数据。唯一的网络行为是你点预览里的外部链接，以及手动点「检查更新」。</p></div>
       <div class="card"><h3><span class="ico">⚖</span>许可</h3><p>MIT License，可自由使用、修改、分发。</p></div>
-      <div class="card"><h3><span class="ico">⌨</span>自己改</h3><p>克隆仓库后 <code>npm install</code> 再 <code>npm start</code>；打包见 README 的「用 Tauri 打包」。</p></div>
+      <div class="card"><h3><span class="ico">⌨</span>自己改</h3><p>克隆仓库后 <code>npm install</code> 再 <code>npm start</code>；三端打包见 README 的「三端支持」。</p></div>
     </div>
   </div>
 </section>
