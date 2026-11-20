@@ -1,36 +1,39 @@
 #!/usr/bin/env python3
-"""把小银 Markdown 的构建产物发布到官网，并生成升级清单。
+"""把三端构建产物发布到官网，并生成/合并升级清单。
 
 用法：
-    python3 tools/release/publish.py --notes "更新说明……"           # 用当前 tauri.conf.json 的版本
-    python3 tools/release/publish.py --notes "……" --dry-run
+    python3 tools/release/publish.py --notes-file notes.txt          # 自动扫描全部产物
+    python3 tools/release/publish.py --notes "一句话" --dry-run
 
-做的事：
-  1. 从 src-tauri/.../bundle/nsis/ 找安装包和 .sig 签名
-  2. 拷安装包到站点 download/（顺便拷一份免安装 exe）
-  3. 写 site/update/latest.json —— 客户端 updater 就拉这个
-  4. 打印最终 URL 与校验值
+自动识别（存在哪些就发哪些，都按平台归位）：
+  Windows  target/x86_64-pc-windows-gnu/release/bundle/nsis/*x64-setup.exe
+  Linux    target/release/bundle/{appimage/*.AppImage, deb/*.deb}
+  macOS    target/<triple>/release/bundle/{macos/*.app.tar.gz, dmg/*.dmg}
 
-客户端地址：https://md.wangjinding.com/update/latest.json
+升级清单是**合并**的：只更新这次扫到的平台，其它平台的条目原样保留
+（这样在 Windows 上发版不会把 macOS 的那条冲掉）。
+
+客户端拉取：https://md.wangjinding.com/update/latest.json
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import platform as _py_platform
+import re
 import shutil
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TARGET = ROOT / "src-tauri" / "target" / "x86_64-pc-windows-gnu" / "release"
-NSIS_DIR = TARGET / "bundle" / "nsis"
 SITE = ROOT / "site"
-SITE_DOWNLOAD = Path("/opt/1panel/www/sites/md.wangjinding.com/index/download")
-SITE_UPDATE = Path("/opt/1panel/www/sites/md.wangjinding.com/index/update")
+SITE_ROOT = Path("/opt/1panel/www/sites/md.wangjinding.com/index")
+SITE_DOWNLOAD = SITE_ROOT / "download"
+SITE_UPDATE = SITE_ROOT / "update"
 BASE_URL = "https://md.wangjinding.com"
+TARGETS = ROOT / "src-tauri" / "target"
 
 
 def conf_version() -> str:
@@ -46,104 +49,148 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def find_one(patterns: list[str]) -> Path | None:
+    for pat in patterns:
+        hits = sorted(TARGETS.glob(pat), key=lambda p: p.stat().st_mtime, reverse=True)
+        if hits:
+            return hits[0]
+    return None
+
+
+def collect():
+    """返回 [{platform, artifact, sig, dl_name}]，只包含本机实际构建出来的。"""
+    found = []
+
+    # ── Windows ──
+    exe = find_one([
+        "x86_64-pc-windows-gnu/release/bundle/nsis/*_x64-setup.exe",
+        "release/bundle/nsis/*_x64-setup.exe",
+    ])
+    if exe:
+        found.append({"platform": "windows-x86_64", "artifact": exe, "sig": Path(str(exe) + ".sig"), "ext": ".exe"})
+
+    # ── Linux（updater 只认 AppImage，deb 额外给人手装）──
+    appimg = find_one(["release/bundle/appimage/*.AppImage", "*/release/bundle/appimage/*.AppImage"])
+    if appimg:
+        found.append({"platform": "linux-x86_64", "artifact": appimg, "sig": Path(str(appimg) + ".sig"), "ext": ".AppImage"})
+    deb = find_one(["release/bundle/deb/*.deb", "*/release/bundle/deb/*.deb"])
+    if deb:
+        found.append({"platform": "linux-deb", "artifact": deb, "sig": None, "ext": ".deb"})
+
+    # ── macOS（Intel / Apple Silicon 各一份）──
+    for triple, key in (("aarch64-apple-darwin", "darwin-aarch64"), ("x86_64-apple-darwin", "darwin-x86_64")):
+        tar = find_one([f"{triple}/release/bundle/macos/*.app.tar.gz",
+                        f"*/{triple}/release/bundle/macos/*.app.tar.gz"])
+        if tar:
+            found.append({"platform": key, "artifact": tar, "sig": Path(str(tar) + ".sig"), "ext": ".app.tar.gz"})
+        dmg = find_one([f"{triple}/release/bundle/dmg/*.dmg", f"*/{triple}/release/bundle/dmg/*.dmg"])
+        if dmg:
+            arch = "aarch64" if "aarch64" in triple else "x64"
+            found.append({"platform": f"{key}-dmg", "artifact": dmg, "sig": None, "ext": f"_{arch}.dmg"})
+
+    return found
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--notes", default="", help="更新说明（会显示在客户的升级弹窗里）")
-    ap.add_argument("--notes-file", default="", help="从文件读更新说明，多行编号时用，避免命令行转义")
+    ap.add_argument("--notes", default="")
+    ap.add_argument("--notes-file", default="")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     if args.notes_file:
         args.notes = Path(args.notes_file).read_text(encoding="utf-8").strip()
 
     version = conf_version()
-    setup = NSIS_DIR / f"XiaoyinMarkdown_{version}_x64-setup.exe"
-    sig_file = Path(str(setup) + ".sig")
-
-    if not setup.exists():
-        print(f"❌ 找不到安装包：{setup}", file=sys.stderr)
-        return 1
-    if not sig_file.exists():
-        print(f"❌ 找不到签名：{sig_file}\n   构建时是否漏了 TAURI_SIGNING_PRIVATE_KEY？", file=sys.stderr)
+    items = collect()
+    if not items:
+        print("❌ 没找到任何构建产物（先跑 `npx tauri build`）", file=sys.stderr)
         return 1
 
-    signature = sig_file.read_text(encoding="utf-8").strip()
-    size = setup.stat().st_size
-    digest = sha256(setup)
-    # 下载文件名带版本号：xymd_2.6.2.exe（浏览器另存就是这个名）
-    dl_name = f"xymd_{version}.exe"
-    url = f"{BASE_URL}/download/{dl_name}"
+    # 现有清单（合并用）
+    manifest_path = SITE_UPDATE / "latest.json"
+    manifest = {"version": version, "notes": args.notes or f"小银 Markdown v{version}",
+                "pub_date": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "platforms": {}}
+    if manifest_path.exists():
+        try:
+            old = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["platforms"] = old.get("platforms", {})
+        except Exception:
+            pass
 
-    manifest = {
-        "version": version,
-        "notes": args.notes or f"小银 Markdown v{version}",
-        "pub_date": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "platforms": {
-            "windows-x86_64": {
-                "signature": signature,
+    print(f"  版本: {version}\n")
+    for it in items:
+        art: Path = it["artifact"]
+        size = art.stat().st_size
+        digest = sha256(art)
+
+        # 落地文件名：xymd_<版本>[_arch].<ext>
+        if it["platform"] == "windows-x86_64":
+            dl = f"xymd_{version}{it['ext']}"
+        elif it["platform"] == "linux-x86_64":
+            dl = f"xymd_{version}_amd64{it['ext']}"
+        elif it["platform"] == "linux-deb":
+            dl = f"xymd_{version}_amd64{it['ext']}"
+        else:
+            dl = f"xymd_{version}{it['ext']}"
+
+        url = f"{BASE_URL}/download/{dl}"
+        has_updater = it["sig"] is not None and it["sig"].exists()
+
+        if has_updater:
+            entry = {
+                "signature": it["sig"].read_text(encoding="utf-8").strip(),
                 "url": url,
                 "size": size,
                 "sha256": digest,
             }
-        },
-    }
+            key = it["platform"]
+            manifest["platforms"][key] = entry
+            print(f"  ✔ {key:18} {art.name}  {size/1048576:.2f} MB → /download/{dl}")
+        else:
+            print(f"  · {it['platform']:18} {art.name}  {size/1048576:.2f} MB → /download/{dl}（不上升级清单）")
 
-    print(f"  版本      : {version}")
-    print(f"  安装包    : {setup.name}  {size/1048576:.2f} MB")
-    print(f"  sha256    : {digest[:32]}…")
-    print(f"  签名      : {signature[:40]}…")
-    print(f"  下载地址  : {url}")
+        if not args.dry_run:
+            SITE_DOWNLOAD.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(art, SITE_DOWNLOAD / dl)
+            (SITE_DOWNLOAD / dl).chmod(0o644)
 
     if args.dry_run:
-        print("  [dry-run] 不写入任何文件")
+        print("\n  [dry-run] 不写入任何文件")
         return 0
 
-    SITE_UPDATE.mkdir(parents=True, exist_ok=True)
-    SITE_DOWNLOAD.mkdir(parents=True, exist_ok=True)
-
-    # ① 安装包（客户下载 + updater 拉取的是同一个）
-    shutil.copy2(setup, SITE_DOWNLOAD / setup.name)
-    (SITE_DOWNLOAD / setup.name).chmod(0o644)
-
-    # ② 免安装版
-    portable = TARGET / "xiaoyin-markdown.exe"
-    if portable.exists():
-        shutil.copy2(portable, SITE_DOWNLOAD / "XiaoyinMarkdown-portable.exe")
-        (SITE_DOWNLOAD / "XiaoyinMarkdown-portable.exe").chmod(0o644)
-
-    # ③ 升级清单（站点 + 仓库各存一份，方便回滚）
+    # 写清单：站点 + 仓库各一份
     body = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+    SITE_UPDATE.mkdir(parents=True, exist_ok=True)
     (SITE_UPDATE / "latest.json").write_text(body, encoding="utf-8")
     (SITE / "update").mkdir(parents=True, exist_ok=True)
     (SITE / "update" / "latest.json").write_text(body, encoding="utf-8")
 
-    # ④ 带版本号的文件名（浏览器另存为 xymd_<版本>.exe）
-    for name, real in ((dl_name, setup.name), (f"xymd_{version}_portable.exe", "XiaoyinMarkdown-portable.exe")):
-        link = SITE_DOWNLOAD / name
-        if link.is_symlink() or link.exists():
-            link.unlink()
-        if (SITE_DOWNLOAD / real).exists():
-            link.symlink_to(real)
+    # 稳定别名（官网页 JS 会按版本改名，这些是 JS 被禁时的兜底）
+    alias_src = None
+    for it in items:
+        if it["platform"] == "windows-x86_64":
+            alias_src = f"xymd_{version}.exe"
+    if alias_src and (SITE_DOWNLOAD / alias_src).exists():
+        for alias in ("latest-setup.exe",):
+            link = SITE_DOWNLOAD / alias
+            if link.is_symlink() or link.exists():
+                link.unlink()
+            link.symlink_to(alias_src)
 
-    # ⑤ 稳定别名：官网页固定链到 latest-setup.exe，发版不用改 HTML
-    for alias, real in (("latest-setup.exe", setup.name), ("latest-portable.exe", "XiaoyinMarkdown-portable.exe")):
-        link = SITE_DOWNLOAD / alias
-        if link.is_symlink() or link.exists():
-            link.unlink()
-        link.symlink_to(real)
-
-    # ⑤ 官网静态兜底版本号也一起改（正常浏览器会被 latest.json 覆盖，这是给无 JS 情况的）
-    import re as _re
+    # 官网静态兜底版本号
     idx = SITE / "index.html"
     if idx.exists():
         html = idx.read_text(encoding="utf-8")
-        html2 = _re.sub(r"(data-ver>)\d+\.\d+\.\d+", lambda m: m.group(1) + version, html)
+        html2 = re.sub(r"(data-ver>)\d+\.\d+\.\d+", lambda m: m.group(1) + version, html)
         if html2 != html:
             idx.write_text(html2, encoding="utf-8")
+            if SITE_ROOT.exists():
+                shutil.copy2(idx, SITE_ROOT / "index.html")
 
-    print(f"\n  ✅ 已发布：{BASE_URL}/update/latest.json")
-    print(f"  ✅ 稳定别名：{BASE_URL}/download/latest-setup.exe")
-    print(f"  ✅ 版本文件名：{url}")
-    print(f"  ✅ 安装包：{url}")
+    print(f"\n  ✅ 清单已更新：{BASE_URL}/update/latest.json（{len(manifest['platforms'])} 个平台）")
+    for k in manifest["platforms"]:
+        print(f"     · {k}")
     return 0
 
 

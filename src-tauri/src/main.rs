@@ -1,5 +1,6 @@
 // 小银 Markdown —— Tauri 2 后端
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+// 只在 Windows 上隐藏控制台窗口（macOS/Linux 没有这个概念）
+#![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
 
 use serde::Serialize;
 use std::fs;
@@ -254,9 +255,10 @@ fn read_dir(path: String) -> DirResult {
 
 /* ---------------- 剪贴板 ---------------- */
 
+/// Windows：把「文件本身」放进剪贴板（CF_HDROP），能直接粘到资源管理器 / 微信
+#[cfg(windows)]
 #[tauri::command]
 fn copy_file_to_clipboard(path: String) -> Result<(), String> {
-    // 手写 CF_HDROP：DROPFILES 头 + 双 \0 结尾的 UTF-16 路径列表
     use windows_sys::Win32::System::DataExchange::{CloseClipboard, EmptyClipboard, OpenClipboard, SetClipboardData};
     use windows_sys::Win32::System::Memory::{GlobalAlloc, GlobalLock, GlobalUnlock, GMEM_MOVEABLE, GMEM_ZEROINIT};
     use windows_sys::Win32::UI::Shell::DROPFILES;
@@ -273,10 +275,10 @@ fn copy_file_to_clipboard(path: String) -> Result<(), String> {
         }
 
         let mut wide: Vec<u16> = path.encode_utf16().collect();
-        wide.push(0); // 路径自身的 \0 终止符
+        wide.push(0);
 
         let header_size = std::mem::size_of::<DROPFILES>();
-        let list_bytes = (wide.len() + 1) * 2; // +1 是列表级双 \0 结束符
+        let list_bytes = (wide.len() + 1) * 2;
         let total = header_size + list_bytes;
 
         let h = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, total);
@@ -291,7 +293,7 @@ fn copy_file_to_clipboard(path: String) -> Result<(), String> {
         }
         let df = locked as *mut DROPFILES;
         (*df).pFiles = header_size as u32;
-        (*df).fWide = 1; // UTF-16
+        (*df).fWide = 1;
         let dst = (locked as *mut u8).add(header_size);
         std::ptr::copy_nonoverlapping(wide.as_ptr() as *const u8, dst, wide.len() * 2);
         GlobalUnlock(h);
@@ -305,18 +307,42 @@ fn copy_file_to_clipboard(path: String) -> Result<(), String> {
     Ok(())
 }
 
+/// macOS / Linux：剪贴板没有跨平台的「文件」格式（要写 GTK/X11 私有 target），
+/// 退化成把路径当文本复制 —— 粘到终端、编辑器、下载框里都还能用。
+#[cfg(not(windows))]
+#[tauri::command]
+fn copy_file_to_clipboard(path: String) -> Result<(), String> {
+    write_clipboard_text(path)
+}
+
+#[cfg(windows)]
 #[tauri::command]
 fn read_clipboard_text() -> String {
     use clipboard_win::formats;
-    use clipboard_win::get_clipboard;
-    get_clipboard(formats::Unicode).unwrap_or_default()
+    clipboard_win::get_clipboard(formats::Unicode).unwrap_or_default()
 }
 
+#[cfg(not(windows))]
+#[tauri::command]
+fn read_clipboard_text() -> String {
+    arboard::Clipboard::new()
+        .and_then(|mut c| c.get_text())
+        .unwrap_or_default()
+}
+
+#[cfg(windows)]
 #[tauri::command]
 fn write_clipboard_text(text: String) -> Result<(), String> {
     use clipboard_win::formats;
-    use clipboard_win::set_clipboard;
-    set_clipboard(formats::Unicode, text).map_err(|e| e.to_string())
+    clipboard_win::set_clipboard(formats::Unicode, text).map_err(|e| e.to_string())
+}
+
+#[cfg(not(windows))]
+#[tauri::command]
+fn write_clipboard_text(text: String) -> Result<(), String> {
+    arboard::Clipboard::new()
+        .and_then(|mut c| c.set_text(text))
+        .map_err(|e| e.to_string())
 }
 
 /* ---------------- 系统 ---------------- */
@@ -324,18 +350,57 @@ fn write_clipboard_text(text: String) -> Result<(), String> {
 #[tauri::command]
 fn reveal_in_explorer(path: String) -> Result<(), String> {
     let p = PathBuf::from(&path);
-    if p.is_file() {
-        std::process::Command::new("explorer")
-            .arg(format!("/select,{}", p.to_string_lossy()))
-            .spawn()
-            .map_err(|e| e.to_string())?;
-    } else {
-        std::process::Command::new("explorer")
-            .arg(&p)
-            .spawn()
-            .map_err(|e| e.to_string())?;
+
+    // Windows：资源管理器并选中该文件
+    #[cfg(windows)]
+    {
+        if p.is_file() {
+            std::process::Command::new("explorer")
+                .arg(format!("/select,{}", p.to_string_lossy()))
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        } else {
+            std::process::Command::new("explorer")
+                .arg(&p)
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        return Ok(());
     }
-    Ok(())
+
+    // macOS：Finder 里选中（open -R）
+    #[cfg(target_os = "macos")]
+    {
+        let _ = &p;
+        if p.is_file() {
+            std::process::Command::new("open")
+                .arg("-R")
+                .arg(&p)
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        } else {
+            std::process::Command::new("open")
+                .arg(&p)
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        return Ok(());
+    }
+
+    // Linux：没有统一的「选中」接口，打开所在目录
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        let dir = if p.is_dir() {
+            p.clone()
+        } else {
+            p.parent().map(|x| x.to_path_buf()).unwrap_or(p.clone())
+        };
+        std::process::Command::new("xdg-open")
+            .arg(&dir)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
 }
 
 #[tauri::command]
@@ -343,11 +408,31 @@ fn open_external(url: String) -> Result<(), String> {
     if !url.starts_with("http://") && !url.starts_with("https://") {
         return Err("仅允许打开 http/https 链接".into());
     }
-    std::process::Command::new("explorer")
-        .arg(&url)
-        .spawn()
-        .map_err(|e| e.to_string())?;
-    Ok(())
+
+    #[cfg(windows)]
+    {
+        std::process::Command::new("explorer")
+            .arg(&url)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&url)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&url)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
 }
 
 #[tauri::command]

@@ -1,13 +1,19 @@
 {
   "version": "2.6.5",
   "notes": "① 状态栏右下角显示当前版本号（就在「检查更新」左边）\n② 版本号从程序本身读取，不会和实际版本对不上",
-  "pub_date": "2026-11-20T03:03:02Z",
+  "pub_date": "2026-11-20T03:26:59Z",
   "platforms": {
     "windows-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN3VxSWFBMjI5Vi9iajIwaVNtWTJlOXJ0Z3B5cGdyWUZsSGVpUXVNbW1aQ2hXazViaUJTWHZ5ZGtUY2NMOUZPMkJZazZZd0ZZa3JFWkZRdDR6RlFSdndZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQzNjgwCWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi41X3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuNQpYcjVSbFB3bzdUeTZ2eTVjSlB1Uk41ZE9MaStSeCtxNVFLZ2RlNHF3QVozRUVvNiszaXp1SVRzait3dTM1U3J3RzBsa0ZXVmVnS21ZejBicXZrZndBdz09Cg==",
       "url": "https://md.wangjinding.com/download/xymd_2.6.5.exe",
       "size": 2324255,
       "sha256": "db19986c7497e5409828f76d130b75df1a14f39ce6b24205c06545d9ed003806"
+    },
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN3AyTHlzdUhtSzVrb0VEelJFUk01Y1ZVLzVXNjVtbjd2V2hQelkzeXRvV2IzT2x1WERNdHovMmZSMDlUcUdESm1tWXBGN0R5REdMSk84YTg5QStCUGdFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQ1MDk1CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi41X2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi42LjUKckFYTE9WQ2JLdkZLcWd5VGc0YWNJQVBKbDFGd2M4K1dNOU1sVnhwMlJRRlo4dEpacHY3RkNhRHZCdEtETENpOUY2VzN2bzFySVdENkFNMGs1Vjg3QVE9PQo=",
+      "url": "https://md.wangjinding.com/download/xymd_2.6.5_amd64.AppImage",
+      "size": 108648952,
+      "sha256": "cc4b73017ae835b3cc4ba25f338ebfcdf20538c31942e9c607ae52d5dc73ab71"
     }
   }
 }

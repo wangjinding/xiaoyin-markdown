@@ -147,6 +147,62 @@ npx electron-packager . XiaoyinMarkdown --platform=win32 --arch=x64 --out=dist ^
 
 打包完成后把 `dist\XiaoyinMarkdown-win32-x64` 整个目录拷到 `%USERPROFILE%\Apps\XiaoyinMarkdown` 覆盖即可（exe 依赖同目录的 dll，不能只拷 exe）。
 
+## 三端支持（Windows / macOS / Linux）
+
+| 平台 | 产物 | 状态 |
+| --- | --- | --- |
+| Windows 10/11 x64 | `xymd_<版本>.exe`（NSIS 安装包）| ✅ 已发布 |
+| Linux x86_64 | `xymd_<版本>_amd64.AppImage` / `.deb` | ✅ 已发布 |
+| macOS 11+ | `xymd_<版本>_aarch64.dmg` / `_x64.dmg` | ⏳ 需在 macOS 上构建（见下）|
+
+### 平台差异
+
+| 能力 | Windows | macOS | Linux |
+| --- | --- | --- | --- |
+| 「复制文件本身」到剪贴板 | ✅ Win32 CF_HDROP | ⚠️ 退化为复制路径文本 | ⚠️ 退化为复制路径文本 |
+| 在文件管理器中显示 | 资源管理器并选中 | `open -R` | `xdg-open` 打开所在目录 |
+| 打开外部链接 | `explorer` | `open` | `xdg-open` |
+| 文本剪贴板 | `clipboard-win` | `arboard` | `arboard` |
+| 在线升级 | ✅ | ✅（需签名）| ✅（仅 AppImage 形态）|
+
+macOS / Linux 的剪贴板没有跨平台的「文件」格式（要写 NSPasteboard / GTK 私有 target），
+所以这两个平台上「复制文件」会退化成把**路径文本**放进剪贴板。
+
+### 本机构建（Linux / Windows 交叉）
+
+```bash
+# Linux 原生（需要 webkit2gtk-4.1 等系统库）
+sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev
+npx tauri build --bundles deb,appimage
+
+# Windows（在 Linux 上交叉编译）
+npx tauri build --target x86_64-pc-windows-gnu --bundles nsis
+```
+
+### macOS
+
+macOS 的包**必须**在 macOS 上构建（需要 Xcode 的命令行工具链，Linux 无法交叉编译）：
+仓库里的 `.github/workflows/build.yml` 会同时在 `macos-latest`（Apple Silicon + Intel）、
+`ubuntu-22.04`、`windows-latest` 三个 runner 上出包，产物在 Actions 的 Artifacts 里。
+
+需要在仓库 Secrets 里配：
+- `TAURI_SIGNING_PRIVATE_KEY` / `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` —— 升级签名私钥
+- `APPLE_CERTIFICATE` / `APPLE_CERTIFICATE_PASSWORD` / `APPLE_SIGNING_IDENTITY` —— 苹果开发者证书（可选）
+- `APPLE_ID` / `APPLE_PASSWORD` / `APPLE_TEAM_ID` —— 公证用（可选）
+
+没有苹果开发者证书时产物是**未签名**的，用户首次打开需要「右键 → 打开」，
+或在终端执行 `xattr -dr com.apple.quarantine /Applications/XiaoyinMarkdown.app`。
+
+### 发布
+
+```bash
+python3 tools/release/publish.py --notes-file notes.txt
+```
+
+会自动扫描 `src-tauri/target` 下**存在的**产物（Windows / Linux / macOS 各归各位），
+拷到官网 `download/`，并把对应平台写进 `update/latest.json`（**合并**语义：
+在 Windows 上发版不会把 macOS 那条冲掉）。
+
 ## 用 Tauri 打包（推荐的安装包）
 
 Tauri 版走系统 WebView2，**不用捆绑运行时**，安装包比 Electron 版小一个数量级。

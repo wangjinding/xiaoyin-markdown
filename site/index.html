@@ -482,6 +482,26 @@
         </p>
         <a class="btn btn-line" data-dl="portable" href="/download/latest-portable.exe" download>下载便携版 .exe</a>
       </div>
+      <div class="dl-card" data-plat="mac" hidden>
+        <h3>macOS</h3>
+        <div class="dl-size">.dmg · Apple Silicon / Intel</div>
+        <p>
+          拖进「应用程序」即可。未做苹果开发者签名，首次打开需<b>右键 → 打开</b>（或
+          在终端执行 <code>xattr -dr com.apple.quarantine /Applications/XiaoyinMarkdown.app</code>）。
+        </p>
+        <a class="btn btn-line" data-dl="mac-arm" href="/download/latest-setup.exe" download>Apple Silicon</a>
+        <a class="btn btn-line" data-dl="mac-x64" href="/download/latest-setup.exe" download style="margin-top:8px">Intel</a>
+      </div>
+      <div class="dl-card" data-plat="linux" hidden>
+        <h3>Linux</h3>
+        <div class="dl-size">AppImage / deb · x86_64</div>
+        <p>
+          AppImage 免安装，<code>chmod +x</code> 后双击即可；deb 适合 Debian / Ubuntu 系。
+          需要系统里有 WebKitGTK 4.1。
+        </p>
+        <a class="btn btn-line" data-dl="linux-appimage" href="/download/latest-setup.exe" download>AppImage</a>
+        <a class="btn btn-line" data-dl="linux-deb" href="/download/latest-setup.exe" download style="margin-top:8px">.deb</a>
+      </div>
       <div class="dl-card">
         <h3>源码 / 旧版</h3>
         <div class="dl-size">Gitea · GitHub</div>
@@ -546,12 +566,26 @@
       document.querySelectorAll('[data-ver]').forEach((el) => { el.textContent = m.version; });
       document.querySelectorAll('[data-notes]').forEach((el) => { el.textContent = m.notes || ''; });
       // 下载文件名带版本号：xymd_2.6.2.exe / xymd_2.6.2_portable.exe
-      const map = { setup: `xymd_${m.version}.exe`, portable: `xymd_${m.version}_portable.exe` };
+      const map = {
+        setup: `xymd_${m.version}.exe`,
+        portable: `xymd_${m.version}_portable.exe`,
+        'mac-arm': `xymd_${m.version}_aarch64.dmg`,
+        'mac-x64': `xymd_${m.version}_x64.dmg`,
+        'linux-appimage': `xymd_${m.version}_amd64.AppImage`,
+        'linux-deb': `xymd_${m.version}_amd64.deb`,
+      };
       Object.entries(map).forEach(([kind, name]) => {
         document.querySelectorAll(`[data-dl="${kind}"]`).forEach((a) => {
           a.setAttribute('href', `/download/${name}`);
           a.setAttribute('download', name);
         });
+      });
+      // 清单里出现哪个平台，才显示那张下载卡（没构建过就不显示，避免 404）
+      const plats = Object.keys(m.platforms || {});
+      const has = (p) => plats.some((k) => k === p || k.startsWith(p));
+      document.querySelectorAll('[data-plat]').forEach((el) => {
+        const ok = el.dataset.plat === 'mac' ? has('darwin') : has('linux');
+        el.hidden = !ok;
       });
     })
     .catch(() => {});
