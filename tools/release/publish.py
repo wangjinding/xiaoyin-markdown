@@ -128,6 +128,15 @@ def main() -> int:
             link.unlink()
         link.symlink_to(real)
 
+    # ⑤ 官网静态兜底版本号也一起改（正常浏览器会被 latest.json 覆盖，这是给无 JS 情况的）
+    import re as _re
+    idx = SITE / "index.html"
+    if idx.exists():
+        html = idx.read_text(encoding="utf-8")
+        html2 = _re.sub(r"(data-ver>)\d+\.\d+\.\d+", lambda m: m.group(1) + version, html)
+        if html2 != html:
+            idx.write_text(html2, encoding="utf-8")
+
     print(f"\n  ✅ 已发布：{BASE_URL}/update/latest.json")
     print(f"  ✅ 稳定别名：{BASE_URL}/download/latest-setup.exe")
     print(f"  ✅ 版本文件名：{url}")

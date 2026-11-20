@@ -1,7 +1,7 @@
 {
   "version": "2.6.3",
   "notes": "更新入口改到状态栏右下角（蓝色「检查更新」文字链接），工具条上的更新图标去掉。\n升级弹窗不再显示当前版本，按钮居中。版本号提示保持简洁。",
-  "pub_date": "2026-11-20T02:42:06Z",
+  "pub_date": "2026-11-20T02:43:08Z",
   "platforms": {
     "windows-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSWWkrQjVjQnNqN2pDQXcvUEM5WGhyOTluTlB3NTRGMlZ6TEpBTDNFWHQzNXNkcmU3QlY3WHJJSVYvSUUzSjRNZFRGSDdyb1VGZ2R0MkU1UUZ2V1NjYU1FMTNjbEl0d0FZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MTQyNDE2CWZpbGU6WGlhb3lpbk1hcmtkb3duXzIuNi4zX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjYuMwp0U2JUdDlvd3Z1MzYxUE41VW10dTJFRjNNeDgvTXhRVWJMSWovdVFKSmtnUG8vM2lFNUxJa3Axa3lWMnd5NmRheEtMWlBJOXVDZGVvWm8yL0J5bGdDZz09Cg==",
